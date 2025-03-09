@@ -1,7 +1,7 @@
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.ListSales;
 
 /// <summary>
-/// Represents a request to list sales.
+/// API request model for ListSales operation
 /// </summary>
 public class ListSalesRequest
 {

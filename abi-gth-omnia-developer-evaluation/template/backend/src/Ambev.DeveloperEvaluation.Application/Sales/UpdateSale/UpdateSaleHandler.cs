@@ -4,35 +4,40 @@ using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Interfaces;
 using MediatR;
 
-namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 
 /// <summary>
-/// Handler for processing CreateSale commands.
+/// Handler for processing UpdateSale commands.
 /// </summary>
-public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleResult>
+public class UpdateSaleHandler : IRequestHandler<UpdateSaleCommand, UpdateSaleResult>
 {
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
 
-    public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper)
+    public UpdateSaleHandler(ISaleRepository saleRepository, IMapper mapper)
     {
         _saleRepository = saleRepository;
         _mapper = mapper;
     }
 
-    public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
+    public async Task<UpdateSaleResult> Handle(UpdateSaleCommand request, CancellationToken cancellationToken)
     {
-        var validator = new CreateSaleValidator();
+        var validator = new UpdateSaleValidator();
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
 
         if (!validationResult.IsValid)
             throw new ValidationException(validationResult.Errors);
 
-        var sale = new Sale
-        {
-            CustomerName = request.CustomerName,
-            CustomerDocument = request.CustomerDocument
-        };
+        var sale = await _saleRepository.GetByNumberAsync(request.Number, cancellationToken);
+        if (sale == null)
+            throw new KeyNotFoundException($"Sale with number {request.Number} not found");
+
+        if (sale.IsCanceled)
+            throw new InvalidOperationException($"Sale {request.Number} is canceled and cannot be updated");
+
+        sale.CustomerName = request.CustomerName;
+        sale.CustomerDocument = request.CustomerDocument;
+        sale.Items.Clear();
 
         foreach (var item in request.Items)
         {
@@ -56,8 +61,8 @@ public class CreateSaleHandler : IRequestHandler<CreateSaleCommand, CreateSaleRe
 
         sale.RecalculateTotalAmount();
 
-        await _saleRepository.CreateAsync(sale, cancellationToken);
+        await _saleRepository.UpdateAsync(sale, cancellationToken);
 
-        return _mapper.Map<CreateSaleResult>(sale);
+        return _mapper.Map<UpdateSaleResult>(sale);
     }
 }

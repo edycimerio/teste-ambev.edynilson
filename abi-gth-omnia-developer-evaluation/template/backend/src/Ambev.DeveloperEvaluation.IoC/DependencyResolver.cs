@@ -1,4 +1,4 @@
-﻿using Ambev.DeveloperEvaluation.IoC.ModuleInitializers;
+using Ambev.DeveloperEvaluation.IoC.ModuleInitializers;
 using Microsoft.AspNetCore.Builder;
 
 namespace Ambev.DeveloperEvaluation.IoC;
@@ -9,6 +9,7 @@ public static class DependencyResolver
     {
         new ApplicationModuleInitializer().Initialize(builder);
         new InfrastructureModuleInitializer().Initialize(builder);
+        new RepositoryModuleInitializer().Initialize(builder);
         new WebApiModuleInitializer().Initialize(builder);
     }
 }

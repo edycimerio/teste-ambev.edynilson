@@ -1,11 +1,11 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
 
 /// <summary>
-/// Implementation of ISaleRepository using Entity Framework Core
+/// Repository implementation for managing sales using Entity Framework Core.
 /// </summary>
 public class SaleRepository : ISaleRepository
 {
@@ -16,50 +16,30 @@ public class SaleRepository : ISaleRepository
         _context = context;
     }
 
-    public async Task<Sale> CreateAsync(Sale sale, CancellationToken cancellationToken = default)
+    public async Task CreateAsync(Sale sale, CancellationToken cancellationToken)
     {
-        _context.Sales.Add(sale);
+        await _context.Sales.AddAsync(sale, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-        return sale;
     }
 
-    public async Task<Sale?> GetByNumberAsync(string number, CancellationToken cancellationToken = default)
+    public async Task<Sale> GetByNumberAsync(string number, CancellationToken cancellationToken)
     {
         return await _context.Sales
             .Include(s => s.Items)
             .FirstOrDefaultAsync(s => s.Number == number, cancellationToken);
     }
 
-    public async Task<IEnumerable<Sale>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Sale>> ListAsync(CancellationToken cancellationToken)
     {
         return await _context.Sales
             .Include(s => s.Items)
+            .OrderByDescending(s => s.SaleDate)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Sale>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
-    {
-        return await _context.Sales
-            .Include(s => s.Items)
-            .Where(s => s.SaleDate >= startDate && s.SaleDate <= endDate)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<Sale> UpdateAsync(Sale sale, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Sale sale, CancellationToken cancellationToken)
     {
         _context.Entry(sale).State = EntityState.Modified;
         await _context.SaveChangesAsync(cancellationToken);
-        return sale;
-    }
-
-    public async Task<bool> CancelAsync(string number, CancellationToken cancellationToken = default)
-    {
-        var sale = await GetByNumberAsync(number, cancellationToken);
-        if (sale == null || sale.IsCanceled)
-            return false;
-
-        sale.Cancel();
-        await _context.SaveChangesAsync(cancellationToken);
-        return true;
     }
 }

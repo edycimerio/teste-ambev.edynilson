@@ -1,44 +1,44 @@
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.GetSale;
 
 /// <summary>
-/// Represents the response when getting a sale.
+/// API response model for GetSale operation
 /// </summary>
 public class GetSaleResponse
 {
     /// <summary>
     /// Gets or sets the sale number.
     /// </summary>
-    public required string Number { get; set; }
+    public string Number { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the sale date.
     /// </summary>
-    public required DateTime SaleDate { get; set; }
+    public DateTime SaleDate { get; set; }
 
     /// <summary>
     /// Gets or sets the customer name.
     /// </summary>
-    public required string CustomerName { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the customer document.
     /// </summary>
-    public required string CustomerDocument { get; set; }
+    public string CustomerDocument { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the total amount.
     /// </summary>
-    public required decimal TotalAmount { get; set; }
+    public decimal TotalAmount { get; set; }
 
     /// <summary>
     /// Gets or sets whether the sale is canceled.
     /// </summary>
-    public required bool IsCanceled { get; set; }
+    public bool IsCanceled { get; set; }
 
     /// <summary>
     /// Gets or sets the sale items.
     /// </summary>
-    public required List<GetSaleItemResponse> Items { get; set; }
+    public List<GetSaleItemResponse> Items { get; set; } = new();
 }
 
 /// <summary>
@@ -49,30 +49,30 @@ public class GetSaleItemResponse
     /// <summary>
     /// Gets or sets the product name.
     /// </summary>
-    public required string ProductName { get; set; }
+    public string ProductName { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the product code.
     /// </summary>
-    public required string ProductCode { get; set; }
+    public string ProductCode { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the quantity.
     /// </summary>
-    public required int Quantity { get; set; }
+    public int Quantity { get; set; }
 
     /// <summary>
     /// Gets or sets the unit price.
     /// </summary>
-    public required decimal UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; }
 
     /// <summary>
     /// Gets or sets the discount applied.
     /// </summary>
-    public required decimal Discount { get; set; }
+    public decimal Discount { get; set; }
 
     /// <summary>
     /// Gets or sets the total price after discount.
     /// </summary>
-    public required decimal TotalPrice { get; set; }
+    public decimal TotalPrice { get; set; }
 }

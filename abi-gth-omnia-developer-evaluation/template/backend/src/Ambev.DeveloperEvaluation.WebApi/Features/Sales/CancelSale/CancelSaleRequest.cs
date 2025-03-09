@@ -1,12 +1,12 @@
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelSale;
 
 /// <summary>
-/// Represents a request to cancel a sale.
+/// API request model for CancelSale operation
 /// </summary>
 public class CancelSaleRequest
 {
     /// <summary>
     /// Gets or sets the sale number.
     /// </summary>
-    public required string Number { get; set; }
+    public string Number { get; set; } = string.Empty;
 }

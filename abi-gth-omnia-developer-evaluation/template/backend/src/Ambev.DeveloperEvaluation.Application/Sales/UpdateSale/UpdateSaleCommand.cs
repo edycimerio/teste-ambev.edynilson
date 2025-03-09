@@ -3,53 +3,58 @@ using MediatR;
 namespace Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 
 /// <summary>
-/// Command to update an existing sale
+/// Command for updating an existing sale.
 /// </summary>
+/// <remarks>
+/// This command is used to update an existing sale with new customer information 
+/// and sale items. It implements <see cref="IRequest{TResponse}"/> to initiate 
+/// the request that returns a <see cref="UpdateSaleResult"/>.
+/// </remarks>
 public class UpdateSaleCommand : IRequest<UpdateSaleResult>
 {
     /// <summary>
     /// Gets or sets the sale number.
     /// </summary>
-    public required string Number { get; set; }
+    public string Number { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the customer name.
     /// </summary>
-    public required string CustomerName { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the customer document.
     /// </summary>
-    public required string CustomerDocument { get; set; }
+    public string CustomerDocument { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the sale items.
     /// </summary>
-    public required List<UpdateSaleItemCommand> Items { get; set; }
+    public List<UpdateSaleItemCommand> Items { get; set; } = new();
 }
 
 /// <summary>
-/// Command to update a sale item
+/// Command for updating a sale item.
 /// </summary>
 public class UpdateSaleItemCommand
 {
     /// <summary>
     /// Gets or sets the product name.
     /// </summary>
-    public required string ProductName { get; set; }
+    public string ProductName { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the product code.
     /// </summary>
-    public required string ProductCode { get; set; }
+    public string ProductCode { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the quantity.
     /// </summary>
-    public required int Quantity { get; set; }
+    public int Quantity { get; set; }
 
     /// <summary>
     /// Gets or sets the unit price.
     /// </summary>
-    public required decimal UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; }
 }

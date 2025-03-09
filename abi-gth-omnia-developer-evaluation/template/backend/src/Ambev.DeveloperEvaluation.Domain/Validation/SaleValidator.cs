@@ -1,43 +1,44 @@
-using Ambev.DeveloperEvaluation.Domain.Entities;
 using FluentValidation;
+using Ambev.DeveloperEvaluation.Domain.Entities;
 
 namespace Ambev.DeveloperEvaluation.Domain.Validation;
 
 /// <summary>
-/// Validator for the Sale entity.
-/// Implements validation rules using FluentValidation.
+/// Validator for the Sale entity using FluentValidation.
 /// </summary>
 public class SaleValidator : AbstractValidator<Sale>
 {
     public SaleValidator()
     {
-        RuleFor(x => x.Number)
+        RuleFor(sale => sale.CustomerName)
             .NotEmpty()
-            .WithMessage("Sale number is required")
-            .MaximumLength(20)
-            .WithMessage("Sale number cannot exceed 20 characters");
+            .WithMessage("Customer name is required");
 
-        RuleFor(x => x.CustomerName)
+        RuleFor(sale => sale.CustomerDocument)
             .NotEmpty()
-            .WithMessage("Customer name is required")
-            .MaximumLength(100)
-            .WithMessage("Customer name cannot exceed 100 characters");
+            .WithMessage("Customer document is required");
 
-        RuleFor(x => x.CustomerDocument)
+        RuleFor(sale => sale.Items)
             .NotEmpty()
-            .WithMessage("Customer document is required")
-            .MaximumLength(20)
-            .WithMessage("Customer document cannot exceed 20 characters");
+            .WithMessage("At least one item is required");
 
-        RuleFor(x => x.Items)
-            .NotEmpty()
-            .WithMessage("At least one item is required")
-            .Must(items => items.Count <= 20)
-            .WithMessage("A sale cannot have more than 20 items")
-            .Must(items => !items.GroupBy(i => i.ProductCode).Any(g => g.Count() > 1))
+        RuleFor(sale => sale.Items)
+            .Must(items => !HasDuplicateProducts(items))
             .WithMessage("Duplicate products are not allowed");
 
-        RuleForEach(x => x.Items)
+        RuleForEach(sale => sale.Items)
             .SetValidator(new SaleItemValidator());
     }
+
+    private bool HasDuplicateProducts(List<SaleItem> items)
+    {
+        if (items == null || !items.Any())
+            return false;
+
+        return items
+            .GroupBy(i => i.ProductCode)
+            .Any(g => g.Count() > 1);
+    }
 }
+
+

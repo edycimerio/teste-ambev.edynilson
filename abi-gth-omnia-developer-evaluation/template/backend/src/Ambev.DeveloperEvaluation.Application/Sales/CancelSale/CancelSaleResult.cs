@@ -1,9 +1,9 @@
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Sales.CancelSale;
+namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 
 /// <summary>
-/// API response model for CancelSale operation
+/// Result for the CancelSale operation.
 /// </summary>
-public class CancelSaleResponse
+public class CancelSaleResult
 {
     /// <summary>
     /// Gets or sets the sale number.

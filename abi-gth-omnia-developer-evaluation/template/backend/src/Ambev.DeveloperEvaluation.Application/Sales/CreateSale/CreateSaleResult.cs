@@ -1,18 +1,20 @@
-using MediatR;
-
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 
 /// <summary>
-/// Command for creating a new sale.
+/// Result for the CreateSale operation.
 /// </summary>
-/// <remarks>
-/// This command is used to capture the required data for creating a sale,
-/// including customer information and sale items. It implements 
-/// <see cref="IRequest{TResponse}"/> to initiate the request that returns 
-/// a <see cref="CreateSaleResult"/>.
-/// </remarks>
-public class CreateSaleCommand : IRequest<CreateSaleResult>
+public class CreateSaleResult
 {
+    /// <summary>
+    /// Gets or sets the sale number.
+    /// </summary>
+    public string Number { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the sale date.
+    /// </summary>
+    public DateTime SaleDate { get; set; }
+
     /// <summary>
     /// Gets or sets the customer name.
     /// </summary>
@@ -24,15 +26,20 @@ public class CreateSaleCommand : IRequest<CreateSaleResult>
     public string CustomerDocument { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the total amount.
+    /// </summary>
+    public decimal TotalAmount { get; set; }
+
+    /// <summary>
     /// Gets or sets the sale items.
     /// </summary>
-    public List<CreateSaleItemCommand> Items { get; set; } = new();
+    public List<CreateSaleItemResult> Items { get; set; } = new();
 }
 
 /// <summary>
-/// Command for creating a sale item.
+/// Result for a sale item in the CreateSale operation.
 /// </summary>
-public class CreateSaleItemCommand
+public class CreateSaleItemResult
 {
     /// <summary>
     /// Gets or sets the product name.
@@ -53,4 +60,14 @@ public class CreateSaleItemCommand
     /// Gets or sets the unit price.
     /// </summary>
     public decimal UnitPrice { get; set; }
+
+    /// <summary>
+    /// Gets or sets the discount applied.
+    /// </summary>
+    public decimal Discount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the total price after discount.
+    /// </summary>
+    public decimal TotalPrice { get; set; }
 }

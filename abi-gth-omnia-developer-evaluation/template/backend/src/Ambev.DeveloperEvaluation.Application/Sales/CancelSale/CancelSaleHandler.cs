@@ -1,45 +1,42 @@
-using Ambev.DeveloperEvaluation.Common.Validation;
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+using AutoMapper;
+using FluentValidation;
+using Ambev.DeveloperEvaluation.Domain.Interfaces;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
 
 /// <summary>
-/// Handler for processing CancelSaleCommand
+/// Handler for processing CancelSale commands.
 /// </summary>
-public class CancelSaleHandler : IRequestHandler<CancelSaleCommand, ValidationResultDetail>
+public class CancelSaleHandler : IRequestHandler<CancelSaleCommand, CancelSaleResult>
 {
     private readonly ISaleRepository _saleRepository;
+    private readonly IMapper _mapper;
 
-    public CancelSaleHandler(ISaleRepository saleRepository)
+    public CancelSaleHandler(ISaleRepository saleRepository, IMapper mapper)
     {
         _saleRepository = saleRepository;
+        _mapper = mapper;
     }
 
-    public async Task<ValidationResultDetail> Handle(CancelSaleCommand request, CancellationToken cancellationToken)
+    public async Task<CancelSaleResult> Handle(CancelSaleCommand request, CancellationToken cancellationToken)
     {
+        var validator = new CancelSaleValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
         var sale = await _saleRepository.GetByNumberAsync(request.Number, cancellationToken);
         if (sale == null)
-        {
-            return new ValidationResultDetail
-            {
-                IsValid = false,
-                Errors = new[] { new ValidationErrorDetail("Number", "Sale not found") }
-            };
-        }
+            throw new KeyNotFoundException($"Sale with number {request.Number} not found");
 
         if (sale.IsCanceled)
-        {
-            return new ValidationResultDetail
-            {
-                IsValid = false,
-                Errors = new[] { new ValidationErrorDetail("Number", "Sale is already canceled") }
-            };
-        }
+            throw new InvalidOperationException($"Sale {request.Number} is already canceled");
 
-        sale.Cancel();
+        sale.IsCanceled = true;
         await _saleRepository.UpdateAsync(sale, cancellationToken);
 
-        return new ValidationResultDetail { IsValid = true };
+        return _mapper.Map<CancelSaleResult>(sale);
     }
 }

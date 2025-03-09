@@ -3,17 +3,13 @@ using MediatR;
 namespace Ambev.DeveloperEvaluation.Application.Sales.ListSales;
 
 /// <summary>
-/// Command to list sales with optional date filtering
+/// Command for listing sales with optional date filters.
 /// </summary>
+/// <remarks>
+/// This command is used to retrieve a list of sales with optional date range filters. 
+/// It implements <see cref="IRequest{TResponse}"/> to initiate the request 
+/// that returns a <see cref="ListSalesResult"/>.
+/// </remarks>
 public class ListSalesCommand : IRequest<ListSalesResult>
 {
-    /// <summary>
-    /// Gets or sets the start date for filtering sales.
-    /// </summary>
-    public DateTime? StartDate { get; set; }
-
-    /// <summary>
-    /// Gets or sets the end date for filtering sales.
-    /// </summary>
-    public DateTime? EndDate { get; set; }
 }

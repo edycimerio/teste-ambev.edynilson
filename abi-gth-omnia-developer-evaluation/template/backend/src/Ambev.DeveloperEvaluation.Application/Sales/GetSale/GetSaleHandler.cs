@@ -1,43 +1,36 @@
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+using AutoMapper;
+using FluentValidation;
+using Ambev.DeveloperEvaluation.Domain.Interfaces;
 using MediatR;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 
 /// <summary>
-/// Handler for processing GetSaleCommand
+/// Handler for processing GetSale commands.
 /// </summary>
-public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult?>
+public class GetSaleHandler : IRequestHandler<GetSaleCommand, GetSaleResult>
 {
     private readonly ISaleRepository _saleRepository;
+    private readonly IMapper _mapper;
 
-    public GetSaleHandler(ISaleRepository saleRepository)
+    public GetSaleHandler(ISaleRepository saleRepository, IMapper mapper)
     {
         _saleRepository = saleRepository;
+        _mapper = mapper;
     }
 
-    public async Task<GetSaleResult?> Handle(GetSaleCommand request, CancellationToken cancellationToken)
+    public async Task<GetSaleResult> Handle(GetSaleCommand request, CancellationToken cancellationToken)
     {
+        var validator = new GetSaleValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+
+        if (!validationResult.IsValid)
+            throw new ValidationException(validationResult.Errors);
+
         var sale = await _saleRepository.GetByNumberAsync(request.Number, cancellationToken);
         if (sale == null)
-            return null;
+            throw new KeyNotFoundException($"Sale with number {request.Number} not found");
 
-        return new GetSaleResult
-        {
-            Number = sale.Number,
-            SaleDate = sale.SaleDate,
-            CustomerName = sale.CustomerName,
-            CustomerDocument = sale.CustomerDocument,
-            TotalAmount = sale.TotalAmount,
-            IsCanceled = sale.IsCanceled,
-            Items = sale.Items.Select(i => new GetSaleItemResult
-            {
-                ProductName = i.ProductName,
-                ProductCode = i.ProductCode,
-                Quantity = i.Quantity,
-                UnitPrice = i.UnitPrice,
-                Discount = i.Discount,
-                TotalPrice = i.TotalPrice
-            }).ToList()
-        };
+        return _mapper.Map<GetSaleResult>(sale);
     }
 }
