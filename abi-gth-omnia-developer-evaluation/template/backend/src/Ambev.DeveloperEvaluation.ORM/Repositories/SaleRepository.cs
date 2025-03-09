@@ -16,10 +16,11 @@ public class SaleRepository : ISaleRepository
         _context = context;
     }
 
-    public async Task CreateAsync(Sale sale, CancellationToken cancellationToken)
+    public async Task<Sale> CreateAsync(Sale sale, CancellationToken cancellationToken)
     {
         await _context.Sales.AddAsync(sale, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+        return sale;
     }
 
     public async Task<Sale> GetByNumberAsync(string number, CancellationToken cancellationToken)
@@ -37,9 +38,10 @@ public class SaleRepository : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateAsync(Sale sale, CancellationToken cancellationToken)
+    public async Task<Sale> UpdateAsync(Sale sale, CancellationToken cancellationToken)
     {
         _context.Entry(sale).State = EntityState.Modified;
         await _context.SaveChangesAsync(cancellationToken);
+        return sale;
     }
 }

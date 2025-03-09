@@ -11,7 +11,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities;
 public class Sale : BaseEntity
 {
     private const string NumberPrefix = "SALE-";
-    private readonly List<SaleItem> _items = new();
 
     /// <summary>
     /// Gets or sets the unique number of the sale.
@@ -60,6 +59,7 @@ public class Sale : BaseEntity
         SaleDate = DateTime.UtcNow;
         TotalAmount = 0;
         IsCanceled = false;
+        Items = new List<SaleItem>();
     }
 
     /// <summary>

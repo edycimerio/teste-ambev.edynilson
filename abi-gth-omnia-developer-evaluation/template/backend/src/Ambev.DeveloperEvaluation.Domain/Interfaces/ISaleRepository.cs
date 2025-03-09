@@ -12,7 +12,8 @@ public interface ISaleRepository
     /// </summary>
     /// <param name="sale">The sale to create.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task CreateAsync(Sale sale, CancellationToken cancellationToken);
+    /// <returns>The created sale.</returns>
+    Task<Sale> CreateAsync(Sale sale, CancellationToken cancellationToken);
 
     /// <summary>
     /// Gets a sale by its number.
@@ -34,5 +35,6 @@ public interface ISaleRepository
     /// </summary>
     /// <param name="sale">The sale to update.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    Task UpdateAsync(Sale sale, CancellationToken cancellationToken);
+    /// <returns>The updated sale.</returns>
+    Task<Sale> UpdateAsync(Sale sale, CancellationToken cancellationToken);
 }
