@@ -1,6 +1,6 @@
 using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
 using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Interfaces;
+using Ambev.DeveloperEvaluation.Domain.Repositories;
 using AutoMapper;
 using FluentAssertions;
 using NSubstitute;

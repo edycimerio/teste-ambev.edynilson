@@ -1,16 +1,7 @@
-using Ambev.DeveloperEvaluation.Application;
-using Ambev.DeveloperEvaluation.Application.Sales.CancelSale;
-using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
-using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
-using Ambev.DeveloperEvaluation.Application.Sales.ListSales;
-using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
-using Ambev.DeveloperEvaluation.Common.Validation;
 using Ambev.DeveloperEvaluation.IoC;
-using Ambev.DeveloperEvaluation.ORM;
-using Ambev.DeveloperEvaluation.WebApi.Middleware;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -20,47 +11,41 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // API Essentials
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        // Database
-        builder.Services.AddDbContext<DefaultContext>(options =>
-            options.UseNpgsql(
-                builder.Configuration.GetConnectionString("DefaultConnection"),
-                b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
-            )
-        );
-
-        // AutoMapper - Registrando apenas os perfis de venda
-        builder.Services.AddAutoMapper(cfg =>
-        {
-            cfg.AddProfile<CreateSaleProfile>();
-            cfg.AddProfile<GetSaleProfile>();
-            cfg.AddProfile<ListSalesProfile>();
-            cfg.AddProfile<UpdateSaleProfile>();
-            cfg.AddProfile<CancelSaleProfile>();
-        });
-
-        // MediatR - Registrando apenas os handlers de venda
-        builder.Services.AddScoped<IRequestHandler<CreateSaleCommand, CreateSaleResult>, CreateSaleHandler>();
-        builder.Services.AddScoped<IRequestHandler<GetSaleCommand, GetSaleResult>, GetSaleHandler>();
-        builder.Services.AddScoped<IRequestHandler<ListSalesCommand, ListSalesResult>, ListSalesHandler>();
-        builder.Services.AddScoped<IRequestHandler<UpdateSaleCommand, UpdateSaleResult>, UpdateSaleHandler>();
-        builder.Services.AddScoped<IRequestHandler<CancelSaleCommand, CancelSaleResult>, CancelSaleHandler>();
-        builder.Services.AddScoped<IMediator, Mediator>();
-
-        // Validation
-        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
-        // IoC
+        // Register dependencies
         builder.RegisterDependencies();
 
-        var app = builder.Build();
+        // Register Swagger
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ambev Developer Evaluation API", Version = "v1" });
 
-        // Exception Handling
-        app.UseMiddleware<ValidationExceptionMiddleware>();
+            // Add JWT Authentication
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
+
+        var app = builder.Build();
 
         // Swagger
         if (app.Environment.IsDevelopment())
@@ -68,6 +53,10 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        // Authentication & Authorization
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         app.MapControllers();
 

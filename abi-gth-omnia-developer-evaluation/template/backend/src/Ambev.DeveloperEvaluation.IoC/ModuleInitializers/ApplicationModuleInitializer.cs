@@ -1,6 +1,6 @@
+using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
+using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Common.Validation;
-using Ambev.DeveloperEvaluation.Domain.Entities;
-using Ambev.DeveloperEvaluation.Domain.Validation;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -12,13 +12,11 @@ public class ApplicationModuleInitializer : IModuleInitializer
 {
     public void Initialize(WebApplicationBuilder builder)
     {
-        // Register FluentValidation apenas para vendas
-        builder.Services.AddValidatorsFromAssemblyContaining<SaleValidator>();
-        builder.Services.AddValidatorsFromAssemblyContaining<SaleItemValidator>();
+        // Register FluentValidation para todos os validadores
+        builder.Services.AddValidatorsFromAssemblyContaining<CreateSaleHandler>();
         builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-        // Register validators apenas para vendas
-        builder.Services.AddScoped<IValidator<Sale>, SaleValidator>();
-        builder.Services.AddScoped<IValidator<SaleItem>, SaleItemValidator>();
+        // Register security services
+        builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
     }
 }
