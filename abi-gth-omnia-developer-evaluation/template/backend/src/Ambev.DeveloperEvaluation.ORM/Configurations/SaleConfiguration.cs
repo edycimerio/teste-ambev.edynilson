@@ -36,8 +36,8 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
             .IsRequired();
 
         builder.HasMany(x => x.Items)
-            .WithOne()
-            .HasForeignKey("SaleId")
+            .WithOne(x => x.Sale)
+            .HasForeignKey(x => x.SaleId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(x => x.Number)

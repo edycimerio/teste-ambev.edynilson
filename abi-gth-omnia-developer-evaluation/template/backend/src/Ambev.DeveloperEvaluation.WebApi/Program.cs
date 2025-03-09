@@ -10,6 +10,7 @@ using Ambev.DeveloperEvaluation.ORM;
 using Ambev.DeveloperEvaluation.WebApi.Middleware;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace Ambev.DeveloperEvaluation.WebApi;
 
@@ -32,15 +33,23 @@ public class Program
             )
         );
 
-        // AutoMapper
-        builder.Services.AddAutoMapper(typeof(Program).Assembly, typeof(ApplicationLayer).Assembly);
+        // AutoMapper - Registrando apenas os perfis de venda
+        builder.Services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<CreateSaleProfile>();
+            cfg.AddProfile<GetSaleProfile>();
+            cfg.AddProfile<ListSalesProfile>();
+            cfg.AddProfile<UpdateSaleProfile>();
+            cfg.AddProfile<CancelSaleProfile>();
+        });
 
-        // MediatR - Registrando apenas os handlers específicos de venda
+        // MediatR - Registrando apenas os handlers de venda
         builder.Services.AddScoped<IRequestHandler<CreateSaleCommand, CreateSaleResult>, CreateSaleHandler>();
         builder.Services.AddScoped<IRequestHandler<GetSaleCommand, GetSaleResult>, GetSaleHandler>();
         builder.Services.AddScoped<IRequestHandler<ListSalesCommand, ListSalesResult>, ListSalesHandler>();
         builder.Services.AddScoped<IRequestHandler<UpdateSaleCommand, UpdateSaleResult>, UpdateSaleHandler>();
         builder.Services.AddScoped<IRequestHandler<CancelSaleCommand, CancelSaleResult>, CancelSaleHandler>();
+        builder.Services.AddScoped<IMediator, Mediator>();
 
         // Validation
         builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));

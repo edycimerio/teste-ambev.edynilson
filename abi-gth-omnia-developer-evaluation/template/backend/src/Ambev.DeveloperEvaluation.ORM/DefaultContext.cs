@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
+using System.IO;
 
 namespace Ambev.DeveloperEvaluation.ORM;
 
@@ -21,12 +22,15 @@ public class DefaultContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 }
-public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
+
+public class DefaultContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 {
     public DefaultContext CreateDbContext(string[] args)
     {
+        var webApiPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "Ambev.DeveloperEvaluation.WebApi");
+        
         IConfigurationRoot configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
+            .SetBasePath(webApiPath)
             .AddJsonFile("appsettings.json")
             .Build();
 
@@ -35,7 +39,7 @@ public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
 
         builder.UseNpgsql(
                connectionString,
-               b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.WebApi")
+               b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.ORM")
         );
 
         return new DefaultContext(builder.Options);
